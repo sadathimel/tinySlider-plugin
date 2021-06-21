@@ -1,61 +1,109 @@
+
 <?php
-/*
-Plugin Name: TinySlider
-Plugin URI: http://example.com/
-Description: This plugin for slider
-Version: 1.0
-Author: sadathimel
-Author URI: http://github.com/sadathossen
-License: GPLv2 or later
-Text Domain: tinyslider
-Domain Path: /languages
+/**
+ * Template Name: TinySlider Page
  */
+ the_post();
+ get_header();
+?>
 
-function tinys_load_textdomain() {
-    load_plugin_textdomain( 'tinyslider', false, dirname( __FILE__ ) . "/languages" );
-}
-add_action( 'plugin_loaded', 'tinys_load_textdomain' );
 
-function tiny_assets() {
-    wp_enqueue_style( 'tinyslider-css', "//cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.3/tiny-slider.css", null );
-    wp_enqueue_script( 'tinyslider-js', "//cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.2/min/tiny-slider.js", null, '1.0', true );
+    <!-- s-content
+    ================================================== -->
+    <section class="s-content s-content--narrow s-content--no-padding-bottom">
 
-    wp_enqueue_script( 'tinyslider-main-js', plugin_dir_url( __FILE__ ) . "/assets/js/main.js", ['jquery'], '1.0', true );
-}
-add_action( 'wp_enqueue_scripts', 'tiny_assets' );
+        <article class="row format-standard">
 
-function tinys_init() {
-    add_image_size( 'tiny-slider', 800, 600, true );
-}
-add_action( 'init', 'tinys_init' );
+            <div class="s-content__header col-full">
+                <h1 class="s-content__header-title">
+                    <?php the_title();?>
+                </h1>
+                <ul class="s-content__header-meta">
+                    <li class="date"><?php the_date();?></li>
+                    <li class="cat">
+                        In
+                        <?php echo get_the_category_list( " " ); ?>
+                    </li>
+                </ul>
+            </div> <!-- end s-content__header -->
 
-function tinys_shortcode_tslider( $arguments, $content ) {
-    $defaults = [
-        'width'  => '800',
-        'height' => '600',
-        'id'     => '',
-    ];
-    $attributes = shortcode_atts( $defaults, $arguments );
-    $content    = do_shortcode( $content );
+            <div class="s-content__media col-full">
+                <div class="s-content__post-thumb">
+                    <?php the_post_thumbnail( "large" );?>
+                </div>
+            </div> <!-- end s-content__media -->
 
-    $shortcode_output = <<<EOD
-         <div id="{$attributes['id']}" style="width:{$attributes['width']} height:{$attributes['height']}">
-            <div class="slider">
-                {$content}
-            </div>
-        </div>
-    EOD;
-    return $shortcode_output;
-}
-add_shortcode( 'tslider', 'tinys_shortcode_tslider' );
+            <div class="col-full s-content__main">
 
-function tinys_shortcode_tslide( $arguments ) {
-    $defaults = [
-        'caption' => '',
-        'id'      => '',
-        'size'    => 'large',
-    ];
-    $attributes = shortcode_atts( $defaults, $arguments );
-    $image_src  = wp_get_attachment_image_src( $attributes['id'], $attributes['size'] );
-}
-add_shortcode( 'tslide', 'tinys_shortcode_tslide' );
+                <?php the_content();?>
+
+                <p class="s-content__tags">
+                    <span>Post Tags</span>
+
+                    <span class="s-content__tag-list">
+                        <?php echo get_the_tag_list(); ?>
+                    </span>
+                </p> <!-- end s-content__tags -->
+
+                <div class="s-content__author">
+                    <?php echo get_avatar( get_the_author_meta( "ID" ) ); ?>
+
+                    <div class="s-content__author-about">
+                        <h4 class="s-content__author-name">
+                            <a href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( "ID" ) ) ); ?>">
+                                <?php the_author();?>
+                            </a>
+                        </h4>
+
+                        <p>
+                            <?php the_author_meta( "description" );?>
+                        </p>
+
+                        
+                    </div>
+                </div>
+
+                <div class="s-content__pagenav">
+                    <div class="s-content__nav">
+                        <div class="s-content__prev">
+                            <?php
+                             $philosophy_prv_post = get_previous_post();
+                             if ( $philosophy_prv_post ):
+                            ?>
+                            <a href="<?php echo get_the_permalink( $philosophy_prv_post ); ?>" rel="prev">
+                                <span><?php _e( "Previous Post", "philosophy" );?></span>
+                                <?php echo get_the_title( $philosophy_prv_post ); ?>
+                            </a>
+                            <?php endif;?>
+                        </div>
+                        <div class="s-content__next">
+                            <?php
+                             $philosophy_next_post = get_next_post();
+                             if ( $philosophy_next_post ):
+                            ?>
+                            <a href="<?php echo get_the_permalink( $philosophy_next_post ); ?>" rel="next">
+                                <span><?php _e( "Next Post", "philosophy" );?></span>
+                                <?php echo get_the_title( $philosophy_next_post ); ?>
+                            </a>
+                            <?php endif;?>
+                        </div>
+                    </div>
+                </div> <!-- end s-content__pagenav -->
+
+            </div> <!-- end s-content__main -->
+
+        </article>
+
+
+        <!-- comments
+        ================================================== -->
+        <?php
+         if ( !post_password_required() ) {
+          comments_template();
+         }
+        ?>
+
+    </section> <!-- s-content -->
+
+
+   <?php get_footer();?>
